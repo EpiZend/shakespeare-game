@@ -1,5 +1,7 @@
 package net.epizend.shakespeare.sub;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JPanel;
 
 /**
@@ -8,25 +10,34 @@ import javax.swing.JPanel;
  */
 public class ReactionFrame extends javax.swing.JFrame {
 
-
     public ReactionFrame() {
         initComponents();
         help();
-        
+
     }
-    
     JPanel help;
 
-    public final void help(){
+    public final void help() {
         help = new ReactionInstruction();
-        help.setSize(440,250);
-        help.setLocation(getWidth()/2 - (help.getWidth()/2), getHeight()/2 - (help.getHeight()/2));
+        help.setSize(440, 250);
+        help.setLocation(getWidth() / 2 - (help.getWidth() / 2), getHeight() / 2 - (help.getHeight() / 2));
         help.setVisible(true);
-        bgPanel.add(help,0);
+        bgPanel.add(help, 0);
     }
-    
-    public void unhelp(){
-        
+
+    public void unhelp() {
+        bgPanel.remove(help);
+    }
+    private Timer timer = new Timer();
+
+    public void start() {
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                System.out.println("now!");
+            }
+        }, (int) (3000 + Math.random() * 6000));
     }
 
     @SuppressWarnings("unchecked")
@@ -74,8 +85,10 @@ public class ReactionFrame extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         bgPanel.remove(startButton);
+        unhelp();
         bgPanel.revalidate();
-        
+        bgPanel.repaint();
+        start();
     }//GEN-LAST:event_startButtonActionPerformed
 
     /**
