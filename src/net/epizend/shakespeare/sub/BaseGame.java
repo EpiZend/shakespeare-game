@@ -1,6 +1,7 @@
 package net.epizend.shakespeare.sub;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -14,6 +15,28 @@ public abstract class BaseGame {
     
     private final String ID = this.getClass().getName();
     private final String HS_ID = ID+"-HS";
+    
+    private final List<Listener> listeners = new LinkedList<Listener>();
+    
+    public abstract void start();
+    
+    public void addListener(Listener listener){
+        listeners.add(listener);
+    }
+    
+    protected void notifySuccess(){
+        for (int i = 0; i < listeners.size(); i++) {
+            Listener listener = listeners.get(i);
+            listener.success();
+        }
+    }
+    
+    protected void notifyFail(){
+        for (int i = 0; i < listeners.size(); i++) {
+            Listener listener = listeners.get(i);
+            listener.fail();
+        }
+    }
     
     public void saveScore(Score sc){
         String str = highscores.get(HS_ID, null);
