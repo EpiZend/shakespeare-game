@@ -1,8 +1,17 @@
 package net.epizend.shakespeare.sub;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -13,6 +22,7 @@ public class ReactionFrame extends javax.swing.JFrame {
     public ReactionFrame() {
         initComponents();
         help();
+
 
     }
     JPanel help;
@@ -29,13 +39,116 @@ public class ReactionFrame extends javax.swing.JFrame {
         bgPanel.remove(help);
     }
     private Timer timer = new Timer();
+    javax.swing.Timer animation = new javax.swing.Timer(10, new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (deer.getX() <= -130) {
+                fail();
+                animation.stop();
+                return;
+            }
+            if (!hit) {
+                deer.setLocation(deer.getX() - 4, deer.getY());
+                bgPanel.invalidate();
+                bgPanel.repaint();
+                animation.restart();
+            }
+        }
+    });
+    JLabel deer;
+    int[] scores = new int[3];
+    int at = 0;
+
+    public void fail() {
+        scores[at++] = 400;
+        bgPanel.remove(deer);
+        bgPanel.invalidate();
+        bgPanel.repaint();
+        if (at == 3) {
+            done();
+        } else {
+            start();
+        }
+    }
+    long add;
+    boolean hit = false;
+
+    public void deer() {
+        System.out.println("add");
+        deer = new JLabel();
+        deer.setSize(481, 421);
+        deer.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (!animation.isRunning()) {
+                    return;
+                }
+                hit = true;
+                animation.stop();
+                scores[at++] = (int) ((System.currentTimeMillis() - add) / 10);
+                bgPanel.remove(deer);
+                bgPanel.repaint();
+                bgPanel.invalidate();
+                if (at == 3) {
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            hit = false;
+                            done();
+                        }
+                    }).start();
+                } else {
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            hit = false;
+                            start();
+                        }
+                    }).start();
+                }
+            }
+        });
+
+        deer.setIcon(new ImageIcon(ReactionFrame.class.getResource("/net/epizend/shakespeare/res/running.gif")));
+        deer.setLocation(getWidth(), (int) (Math.random() * (getHeight() - 300)));
+
+        bgPanel.add(deer, 0);
+        bgPanel.invalidate();
+
+        bgPanel.repaint();
+        add = System.currentTimeMillis();
+
+        animation.start();
+    }
+
+    private void done() {
+        int avg = 0;
+        for (int i = 0; i < scores.length; i++) {
+            int j = scores[i];
+            avg += j;
+        }
+        avg /= 3;
+        int answer = JOptionPane.showOptionDialog(this, "Your score is " + (avg + 0.0) / 100 + " seconds", "Congratulations!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new String[]{"Retry!", "End game"}, "End Game");
+        if (answer == JOptionPane.YES_OPTION) {
+            at = 0;
+            start();
+        } else if (answer == JOptionPane.NO_OPTION) {
+            System.exit(0);
+        } else {
+            System.exit(0);
+        }
+    }
 
     public void start() {
         timer.schedule(new TimerTask() {
 
             @Override
             public void run() {
-                System.out.println("now!");
+                deer();
             }
         }, (int) (3000 + Math.random() * 6000));
     }

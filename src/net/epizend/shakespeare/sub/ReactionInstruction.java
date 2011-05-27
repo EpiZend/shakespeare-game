@@ -26,7 +26,7 @@ public class ReactionInstruction extends JPanel {
             "prosecuted for poaching deers and therefore had\n"+
             "to move to London.\n\n"+
             "Three deers will appear on the screen, going from\n"+
-            "the left to the right. As quickly as you see a deer,\n"+
+            "the right to the left. As quickly as you see a deer,\n"+
             "you need to fire on it. Your score will be the average\n"+
             "of the time it took for you to shoot at the deers.\n";
     
